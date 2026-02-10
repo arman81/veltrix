@@ -1,5 +1,8 @@
 # Veltrix
 
+<img width="2752" height="1536" alt="Gemini_Generated_Image_2jwqtm2jwqtm2jwq" src="https://github.com/user-attachments/assets/a745815f-73c6-4b4c-bb56-1ac5f96733a5" />
+
+
 
 # Scheduler Archiecture 
 
