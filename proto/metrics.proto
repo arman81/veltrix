@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package metrics;
+
+option go_package = "gpu-optimizer/proto/gen";
+
+service MetricsService {
+  rpc SendMetrics (MetricBatch) returns (Ack);
+}
+
+message Metric {
+  string gpu_id = 1;
+  float utilization = 2;
+  float memory = 3;
+  int64 timestamp = 4;
+}
+
+message MetricBatch {
+  string node_id = 1;
+  repeated Metric metrics = 2;
+}
+
+message Ack {
+  bool success = 1;
+}
