@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"gpu-optimizer/agent/internal/scheduler"
+	"veltrix/agent/internal/scheduler"
 )
 
 func main() {

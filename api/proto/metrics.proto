@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package veltrix.metrics;
+
+option go_package = "github.com/yourorg/gpu-optimizer/api/gen/metrics";
+
+import "common.proto";
+
+message GPUMetric {
+
+  string gpu_id = 1;
+
+  double utilization = 2;
+
+  double memory_used_mb = 3;
+
+  double memory_total_mb = 4;
+
+  double temperature_c = 5;
+
+  double power_watts = 6;
+
+  bool ecc_errors = 7;
+
+  repeated GPUProcess processes = 8;
+
+}
+
+message GPUProcess {
+
+  int32 pid = 1;
+
+  string name = 2;
+
+  double memory_mb = 3;
+
+}
+
+message MetricBatch {
+
+  veltrix.common.Metadata metadata = 1;
+
+  repeated GPUMetric metrics = 2;
+
+}

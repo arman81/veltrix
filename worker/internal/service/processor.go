@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"gpu-optimizer/worker/internal/rules"
+	"veltrix/worker/internal/rules"
 )
 
 type Processor struct {

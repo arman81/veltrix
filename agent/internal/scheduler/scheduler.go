@@ -4,10 +4,10 @@ import (
 	"log"
 	"time"
 
-	"gpu-optimizer/agent/internal/collector"
-	"gpu-optimizer/agent/internal/grpc"
+	"veltrix/agent/internal/collector"
+	"veltrix/agent/internal/grpc"
 
-	pb "gpu-optimizer/proto/gen"
+	pb "veltrix/proto/gen"
 )
 
 func Start(endpoint string) {

@@ -4,13 +4,13 @@ import (
 	"log"
 	"net"
 
-	"gpu-optimizer/api/internal/config"
-	"gpu-optimizer/api/internal/db"
-	"gpu-optimizer/api/internal/grpc"
-	"gpu-optimizer/api/internal/kafka"
-	"gpu-optimizer/api/internal/service"
+	"veltrix/api/internal/config"
+	"veltrix/api/internal/db"
+	"veltrix/api/internal/grpc"
+	"veltrix/api/internal/kafka"
+	"veltrix/api/internal/service"
 
-	pb "gpu-optimizer/proto/gen"
+	pb "veltrix/proto/gen"
 
 	"google.golang.org/grpc"
 )

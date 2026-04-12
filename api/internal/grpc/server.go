@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"gpu-optimizer/api/internal/service"
-	pb "gpu-optimizer/proto/gen"
+	"veltrix/api/internal/service"
+	pb "veltrix/proto/gen"
 )
 
 type Server struct {

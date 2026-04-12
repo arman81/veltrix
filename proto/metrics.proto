@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package metrics;
 
-option go_package = "gpu-optimizer/proto/gen";
+option go_package = "veltrix/proto/gen";
 
 service MetricsService {
   rpc SendMetrics (MetricBatch) returns (Ack);

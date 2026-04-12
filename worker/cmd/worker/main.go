@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"gpu-optimizer/worker/internal/kafka"
-	"gpu-optimizer/worker/internal/service"
+	"veltrix/worker/internal/kafka"
+	"veltrix/worker/internal/service"
 )
 
 func main() {

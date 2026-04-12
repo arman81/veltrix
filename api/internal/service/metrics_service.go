@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"log"
 
-	"gpu-optimizer/api/internal/kafka"
-	pb "gpu-optimizer/proto/gen"
+	"veltrix/api/internal/kafka"
+	pb "veltrix/proto/gen"
 )
 
 type MetricsService struct {

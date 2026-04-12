@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	pb "gpu-optimizer/proto/gen"
+	pb "veltrix/proto/gen"
 
 	"google.golang.org/grpc"
 )
