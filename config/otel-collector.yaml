@@ -1,0 +1,40 @@
+# OpenTelemetry Collector configuration for Veltrix.
+#
+# Receives metrics and traces from the API server and node agents via OTLP.
+# Exports metrics to Prometheus and (optionally) traces to Jaeger.
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
+exporters:
+  # Prometheus exporter — Grafana reads from this
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: veltrix
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  # Debug exporter — logs all telemetry to stdout (dev only)
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus, debug]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug]
