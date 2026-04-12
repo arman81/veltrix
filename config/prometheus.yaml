@@ -1,14 +1,8 @@
-# Prometheus configuration for Veltrix.
-#
-# Scrapes metrics from the OTel Collector's Prometheus exporter.
-# Grafana connects to Prometheus as a data source.
-
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_interval: 5s
+  evaluation_interval: 5s
 
 scrape_configs:
-  # Scrape the OTel Collector's Prometheus exporter
-  - job_name: "veltrix-otel"
+  - job_name: "veltrix-simulator"
     static_configs:
-      - targets: ["otel-collector:8889"]
+      - targets: ["simulator:9100"]

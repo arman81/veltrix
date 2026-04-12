@@ -30,6 +30,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/veltrix-api ./cmd/api
 # Build agent
 RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/veltrix-agent ./cmd/agent
 
+# Build simulator
+RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/veltrix-simulator ./cmd/simulator
+
 # ---------------------------------------------------------------------------
 # Stage 2a: API server image
 # ---------------------------------------------------------------------------
@@ -50,3 +53,13 @@ RUN apk --no-cache add ca-certificates
 COPY --from=builder /bin/veltrix-agent /usr/local/bin/veltrix-agent
 
 ENTRYPOINT ["veltrix-agent"]
+
+# ---------------------------------------------------------------------------
+# Stage 2c: Simulator image (dev only)
+# ---------------------------------------------------------------------------
+FROM alpine:3.19 AS simulator
+
+COPY --from=builder /bin/veltrix-simulator /usr/local/bin/veltrix-simulator
+
+EXPOSE 9100
+ENTRYPOINT ["veltrix-simulator"]

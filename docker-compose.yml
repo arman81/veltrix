@@ -3,7 +3,47 @@ version: "3.9"
 services:
 
   # ---------------------------------------------------------------------------
-  # DATA PLANE — infrastructure services
+  # SIMULATOR — fake GPU metrics for development
+  # ---------------------------------------------------------------------------
+
+  simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: simulator
+    ports:
+      - "9100:9100"
+
+  # ---------------------------------------------------------------------------
+  # TELEMETRY PLANE — observability pipeline
+  # ---------------------------------------------------------------------------
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    depends_on:
+      - simulator
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: veltrix
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/gpu-cluster-overview.json
+    volumes:
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana/plugins
+    depends_on:
+      - prometheus
+
+  # ---------------------------------------------------------------------------
+  # DATA PLANE — infrastructure services (not needed for dashboard demo)
   # ---------------------------------------------------------------------------
 
   postgres:
@@ -22,6 +62,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    profiles:
+      - full
 
   redis:
     image: redis:7-alpine
@@ -33,86 +75,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  # ---------------------------------------------------------------------------
-  # TELEMETRY PLANE — observability pipeline
-  # ---------------------------------------------------------------------------
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
-    ports:
-      - "4317:4317"   # OTLP gRPC receiver
-      - "4318:4318"   # OTLP HTTP receiver
-      - "8889:8889"   # Prometheus metrics exporter
-    volumes:
-      - ./config/otel-collector.yaml:/etc/otelcol-contrib/config.yaml
-    depends_on:
-      - prometheus
-
-  prometheus:
-    image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./config/prometheus.yaml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus
-
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_PASSWORD: veltrix
-      GF_INSTALL_PLUGINS: ""
-    volumes:
-      - grafana_data:/var/lib/grafana
-    depends_on:
-      - prometheus
-
-  # ---------------------------------------------------------------------------
-  # CONTROL PLANE — Veltrix services
-  # ---------------------------------------------------------------------------
-
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: api
-    ports:
-      - "8080:8080"
-    environment:
-      VELTRIX_PORT: "8080"
-      VELTRIX_POSTGRES_HOST: postgres
-      VELTRIX_POSTGRES_PORT: "5432"
-      VELTRIX_POSTGRES_DB: veltrix
-      VELTRIX_POSTGRES_USER: postgres
-      VELTRIX_POSTGRES_PASS: veltrix
-      VELTRIX_REDIS_ADDR: "redis:6379"
-      VELTRIX_OTEL_ENDPOINT: "otel-collector:4317"
-      VELTRIX_AUTH_ENABLED: "false"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-
-  # ---------------------------------------------------------------------------
-  # EXECUTION PLANE — Node agent
-  # ---------------------------------------------------------------------------
-
-  agent:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: agent
-    environment:
-      VELTRIX_API_ENDPOINT: "http://api:8080"
-      VELTRIX_OTEL_ENDPOINT: "otel-collector:4317"
-      VELTRIX_NODE_ID: "dev-node-1"
-    depends_on:
-      - api
+    profiles:
+      - full
 
 volumes:
   postgres_data:
