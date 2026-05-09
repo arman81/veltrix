@@ -1,0 +1,335 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: veltrix-core
+    folder: Veltrix
+    interval: 1m
+    rules:
+      - uid: veltrix-cost-burn
+        title: Cost burn rate exceeds hourly target
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus-veltrix
+            model:
+              refId: A
+              expr: veltrix_cost_burn_rate_usd_per_hour - (1.5 * veltrix_cost_budget_target_usd{window="hourly"})
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 0
+              to: 0
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        labels:
+          severity: major
+          team: platform
+        annotations:
+          summary: Burn rate exceeds 1.5x hourly target
+          runbook_url: https://veltrix.example.com/runbooks/cost-burn
+
+      - uid: veltrix-queue-backlog
+        title: Scheduler queue backlog growing
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus-veltrix
+            model:
+              refId: A
+              expr: sum(veltrix_scheduler_queue_depth)
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 0
+              to: 0
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [25]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: major
+          team: platform
+        annotations:
+          summary: Queue depth above 25 jobs for 5m
+          runbook_url: https://veltrix.example.com/runbooks/queue-backlog
+
+      - uid: veltrix-throughput-drop
+        title: Training throughput dropped
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus-veltrix
+            model:
+              refId: A
+              expr: avg(veltrix_training_throughput_samples_per_second)
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 0
+              to: 0
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [10]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 3m
+        labels:
+          severity: major
+          team: platform
+        annotations:
+          summary: Avg training throughput below 10 samples/s
+          runbook_url: https://veltrix.example.com/runbooks/throughput-drop
+
+      - uid: veltrix-sched-p99
+        title: Scheduler decision p99 high
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus-veltrix
+            model:
+              refId: A
+              expr: histogram_quantile(0.99, sum by (le)(rate(veltrix_scheduler_decision_seconds_bucket[5m])))
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 0
+              to: 0
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [1]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        labels:
+          severity: major
+          team: platform
+        annotations:
+          summary: Decision p99 exceeds 1s for 5m
+          runbook_url: https://veltrix.example.com/runbooks/scheduler-p99
+
+      - uid: veltrix-low-util
+        title: Cluster underutilized
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus-veltrix
+            model:
+              refId: A
+              expr: avg(veltrix_gpu_utilization_percent{workload_type!=""})
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 0
+              to: 0
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [30]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 10m
+        labels:
+          severity: minor
+          team: platform
+        annotations:
+          summary: Cluster utilization below 30% for 10m
+          runbook_url: https://veltrix.example.com/runbooks/low-util
+
+      - uid: veltrix-high-temp
+        title: GPU temperature critical
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus-veltrix
+            model:
+              refId: A
+              expr: max(veltrix_gpu_temperature_celsius)
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 0
+              to: 0
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [85]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        labels:
+          severity: major
+          team: platform
+        annotations:
+          summary: GPU temperature above 85C
+          runbook_url: https://veltrix.example.com/runbooks/high-temp
+
+      - uid: veltrix-oom-risk
+        title: GPU memory near saturation
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: prometheus-veltrix
+            model:
+              refId: A
+              expr: max(veltrix_gpu_memory_used_bytes / veltrix_gpu_memory_total_bytes)
+              instant: true
+          - refId: B
+            datasourceUid: __expr__
+            relativeTimeRange:
+              from: 0
+              to: 0
+            model:
+              refId: B
+              type: threshold
+              expression: A
+              datasource:
+                type: __expr__
+                uid: __expr__
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0.92]
+                  operator:
+                    type: and
+                  query:
+                    params: [A]
+                  reducer:
+                    type: last
+                    params: []
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 2m
+        labels:
+          severity: major
+          team: platform
+        annotations:
+          summary: GPU memory above 92%
+          runbook_url: https://veltrix.example.com/runbooks/oom-risk

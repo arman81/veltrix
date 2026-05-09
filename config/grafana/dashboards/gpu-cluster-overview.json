@@ -448,6 +448,109 @@
         "legendFormat": "GPU {{device_index}}",
         "refId": "A"
       }]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 41},
+      "id": 200,
+      "title": "Interconnect & I/O",
+      "type": "row"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {"lineWidth": 2, "fillOpacity": 10},
+          "unit": "Bps",
+          "min": 0
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 42},
+      "id": 201,
+      "options": {
+        "legend": {"displayMode": "table", "placement": "right", "calcs": ["mean", "max"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "title": "NVLink RX (per peer)",
+      "type": "timeseries",
+      "targets": [{
+        "expr": "rate(veltrix_gpu_nvlink_rx_bytes_total[1m])",
+        "legendFormat": "{{gpu_id}}→{{peer_gpu_id}}",
+        "refId": "A"
+      }]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {"lineWidth": 2, "fillOpacity": 10},
+          "unit": "Bps",
+          "min": 0
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 42},
+      "id": 202,
+      "options": {
+        "legend": {"displayMode": "table", "placement": "right", "calcs": ["mean", "max"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "title": "NVLink TX (per peer)",
+      "type": "timeseries",
+      "targets": [{
+        "expr": "rate(veltrix_gpu_nvlink_tx_bytes_total[1m])",
+        "legendFormat": "{{gpu_id}}→{{peer_gpu_id}}",
+        "refId": "A"
+      }]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {"lineWidth": 2, "fillOpacity": 10},
+          "unit": "Bps",
+          "min": 0
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 50},
+      "id": 203,
+      "options": {
+        "legend": {"displayMode": "table", "placement": "right", "calcs": ["mean", "max"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "title": "PCIe RX",
+      "type": "timeseries",
+      "targets": [{
+        "expr": "rate(veltrix_gpu_pcie_rx_bytes_total[1m])",
+        "legendFormat": "{{gpu_id}} ({{node_id}})",
+        "refId": "A"
+      }]
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {"lineWidth": 2, "fillOpacity": 10},
+          "unit": "Bps",
+          "min": 0
+        }
+      },
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 50},
+      "id": 204,
+      "options": {
+        "legend": {"displayMode": "table", "placement": "right", "calcs": ["mean", "max"]},
+        "tooltip": {"mode": "multi", "sort": "desc"}
+      },
+      "title": "PCIe TX",
+      "type": "timeseries",
+      "targets": [{
+        "expr": "rate(veltrix_gpu_pcie_tx_bytes_total[1m])",
+        "legendFormat": "{{gpu_id}} ({{node_id}})",
+        "refId": "A"
+      }]
     }
   ],
   "refresh": "5s",
@@ -471,5 +574,5 @@
   "timezone": "browser",
   "title": "Veltrix — GPU Cluster Overview",
   "uid": "veltrix-gpu-overview",
-  "version": 1
+  "version": 2
 }

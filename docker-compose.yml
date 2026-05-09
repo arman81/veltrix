@@ -29,16 +29,25 @@ services:
       - simulator
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.3.0
     ports:
       - "3000:3000"
     environment:
       GF_SECURITY_ADMIN_PASSWORD: veltrix
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/gpu-cluster-overview.json
+      GF_INSTALL_PLUGINS: grafana-clock-panel
+      SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/REPLACE_ME"
     volumes:
       - ./config/grafana/provisioning:/etc/grafana/provisioning
       - ./config/grafana/dashboards:/var/lib/grafana/dashboards
-      - grafana_data:/var/lib/grafana/plugins
+      - grafana_data:/var/lib/grafana
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
     depends_on:
       - prometheus
 

@@ -1,0 +1,28 @@
+apiVersion: 1
+
+deleteContactPoints:
+  - orgId: 1
+    name: email receiver
+  - orgId: 1
+    uid: ""
+
+contactPoints:
+  - orgId: 1
+    name: slack-veltrix
+    receivers:
+      - uid: cp-slack-veltrix
+        type: slack
+        settings:
+          url: ${SLACK_WEBHOOK_URL}
+          recipient: "#veltrix-alerts"
+          title: "{{ .CommonLabels.alertname }}"
+        disableResolveMessage: false
+  - orgId: 1
+    name: email-oncall
+    receivers:
+      - uid: cp-email-oncall
+        type: email
+        settings:
+          addresses: oncall@veltrix.example.com
+          singleEmail: false
+        disableResolveMessage: false
